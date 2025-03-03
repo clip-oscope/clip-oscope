@@ -39,6 +39,12 @@ Detailed instructions for running experiments can be found in their respective d
 For a complete understanding of our research methodology and findings, please refer to our paper included in this repository.
 
 ## 👥 Contributors
+- [Reza Abbasi]
+- [Ali Nazari]
+- [Aminreza Sefid]
+- [Mohammadali Banayeeanzade]
+- [Mohammad Hossein Rohban]
+- [Mahdieh Soleymani Baghshah]
 
 [To be added: List of contributors]
 
@@ -52,4 +58,4 @@ For a complete understanding of our research methodology and findings, please re
 
 ## 🔗 References
 
-- [CLIP Original Paper](https://arxiv.org/pdf/2502.19842)
+- [CLIP Under the Microscope](https://arxiv.org/pdf/2502.19842)
