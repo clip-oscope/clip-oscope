@@ -1,16 +1,55 @@
-## Hi there 👋
+# CLIP Under the Microscope: A Fine-Grained Analysis
 
-<!--
-**clip-analysis/Clip-Analysis** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+This repository contains the implementation and experimental analysis for our research on CLIP (Contrastive Language-Image Pre-training) model, focusing on a detailed examination of its multi-object understanding capabilities.
 
-Here are some ideas to get you started:
+## 📋 Project Overview
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+This research project aims to provide a comprehensive analysis of CLIP's behavior, particularly focusing on:
+- Image Encoder analysis and experiments
+- Text Encoder analysis and experiments
+- Multi-object understanding capabilities
+- Fine-grained behavioral analysis
+
+## 🗂️ Repository Structure
+
+```
+.
+├── Image Encoder Experiments/   # Experiments focused on CLIP's image encoder
+├── Text Encoder Experiments/    # Experiments focused on CLIP's text encoder
+├── Preparations/               # Setup and preparation scripts
+└── CLIP_Under_the_Microscope_A_Fine_Grained_Analysis_of_Multi_Object.pdf  # Research paper
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+[To be added: List of required dependencies and software]
+
+### Installation
+[To be added: Installation instructions]
+
+## 🧪 Running Experiments
+
+Detailed instructions for running experiments can be found in their respective directories:
+- Image Encoder experiments in `/Image Encoder Experiments`
+- Text Encoder experiments in `/Text Encoder Experiments`
+
+## 📚 Documentation
+
+For a complete understanding of our research methodology and findings, please refer to our paper included in this repository.
+
+## 👥 Contributors
+
+[To be added: List of contributors]
+
+## 📄 License
+
+[To be added: License information]
+
+## 📬 Contact
+
+[To be added: Contact information]
+
+## 🔗 References
+
+- [CLIP Original Paper](https://arxiv.org/pdf/2502.19842)
