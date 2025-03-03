@@ -1,0 +1,9 @@
+conda create -n lsam python=3.10
+conda activate lsam
+conda install pytorch==2.4.1 torchvision==0.19.1 -c pytorch
+
+conda install nvidia::cuda-nvcc -y
+sudo find / -name nvcc
+#ser CUDA_HOME where nvcc is installed on conda env
+pip install -U git+https://github.com/luca-medeiros/lang-segment-anything.git
+#iterative install dev version of missing packages

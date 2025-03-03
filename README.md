@@ -19,19 +19,12 @@ This research project aims to provide a comprehensive analysis of CLIP's behavio
 └── Preparations/               # Setup and preparation scripts
 ```
 
-## 🚀 Getting Started
-
-### Prerequisites
-[To be added: List of required dependencies and software]
-
-### Installation
-[To be added: Installation instructions]
-
 ## 🧪 Running Experiments
 
 Detailed instructions for running experiments can be found in their respective directories:
 - Image Encoder experiments in `/Image Encoder Experiments`
 - Text Encoder experiments in `/Text Encoder Experiments`
+- Preparations in `/Preparations`
 
 ## 📚 Documentation
 
