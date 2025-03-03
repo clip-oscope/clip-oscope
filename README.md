@@ -16,8 +16,7 @@ This research project aims to provide a comprehensive analysis of CLIP's behavio
 .
 ├── Image Encoder Experiments/   # Experiments focused on CLIP's image encoder
 ├── Text Encoder Experiments/    # Experiments focused on CLIP's text encoder
-├── Preparations/               # Setup and preparation scripts
-└── CLIP_Under_the_Microscope_A_Fine_Grained_Analysis_of_Multi_Object.pdf  # Research paper
+└── Preparations/               # Setup and preparation scripts
 ```
 
 ## 🚀 Getting Started
