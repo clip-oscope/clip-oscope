@@ -39,14 +39,12 @@ Detailed instructions for running experiments can be found in their respective d
 For a complete understanding of our research methodology and findings, please refer to our paper included in this repository.
 
 ## 👥 Contributors
-- [Reza Abbasi]
-- [Ali Nazari]
-- [Aminreza Sefid]
-- [Mohammadali Banayeeanzade]
-- [Mohammad Hossein Rohban]
-- [Mahdieh Soleymani Baghshah]
-
-[To be added: List of contributors]
+- Reza Abbasi
+- Ali Nazari
+- Aminreza Sefid
+- Mohammadali Banayeeanzade
+- Mohammad Hossein Rohban
+- Mahdieh Soleymani Baghshah
 
 ## 📄 License
 
