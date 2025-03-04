@@ -15,7 +15,7 @@ This directory contains various components and tools for working with text and o
 
 ## Usage Instructions
 
-### Open CLIP Attention
+### Area-Calculation
 
 ### Requirements
 1. [Language Segment-Anything](https://github.com/luca-medeiros/lang-segment-anything)
