@@ -19,7 +19,6 @@ This directory contains various components and tools for working with text and o
 
 ### Requirements
 1. [Language Segment-Anything](https://github.com/luca-medeiros/lang-segment-anything)
-2. [OpenCLIP](https://github.com/mlfoundations/open_clip)
 
 ## Prerequisites
 
@@ -144,7 +143,6 @@ The output file contains object detection and segmentation results with the foll
 
 Note: Not all objects listed in the `objects` field may have corresponding entries in `found_objects` if they were not successfully detected.
 
-Or you 
 
 ### LLaMA 3 Core Implementation
 
