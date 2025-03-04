@@ -14,12 +14,17 @@ This directory contains various components and tools for working with text and o
 
 Before using these components, ensure you have:
 1. Python 3.8 or higher installed
-2. Required dependencies (specific requirements for each component can be found in their respective directories)
+2. Required dependencies (specific requirements for each component can be found in their respective section)
 3. Sufficient GPU resources for running the models
 
 ## Usage Instructions
 
 ### Open CLIP Attention
+
+#### requirements
+1. [Language Segment-Anything](https://github.com/luca-medeiros/lang-segment-anything)
+2. [OpenCLIP](https://github.com/mlfoundations/open_clip)
+3. Follow their instruction to setup a enviroment
 
 The `open-clip-attention` module provides attention mechanisms for processing visual and textual data:
 

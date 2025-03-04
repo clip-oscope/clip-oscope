@@ -48,4 +48,5 @@ For a complete understanding of our research methodology and findings, please re
 
 ## 🔗 References
 
-- [CLIP Under the Microscope](https://arxiv.org/pdf/2502.19842)
+- 📄 [CLIP Under the Microscope](https://arxiv.org/pdf/2502.19842)
+- 💾 [ComCo-SimCo Datasets](https://huggingface.co/datasets/clip-oscope/simco-comco)

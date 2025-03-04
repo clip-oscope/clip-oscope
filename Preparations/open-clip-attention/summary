@@ -1,6 +1,8 @@
-conda create -n lsam python=3.10
+conda create -n lsam python=3.11
 conda activate lsam
-conda install pytorch==2.4.1 torchvision==0.19.1 -c pytorch
+conda install pytorch==2.4.1 torchvision==0.19.1 cuda-nvcc -c nvidia -c pytorch
+
+pip install torch==2.4.1 torchvision==0.19.1 --extra-index-url https://download.pytorch.org/whl/cu124
 
 conda install nvidia::cuda-nvcc -y
 sudo find / -name nvcc
