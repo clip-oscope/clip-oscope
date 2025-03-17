@@ -1,4 +1,4 @@
-# import libraries
+import argparse
 from tqdm.auto import tqdm
 import os
 import pandas as pd
@@ -6,15 +6,27 @@ import torch
 from PIL import Image
 import open_clip
 
-# dataset paths for one_object and custom dataset. 
-one_object_dataset_path = 'CoCo-OneObject'
-many_objects_dataset_path = {'CoCo-FourObject-Middle-Big': (4, 2)} # {dataset_path: (objects_size, biased_object_pos)}
+# Command-line argument parser
+parser = argparse.ArgumentParser(description='Image-Text Matching Experiment')
+parser.add_argument('--one_object_dataset_path', type=str, default='CoCo-OneObject', help='Path to one-object dataset')
+parser.add_argument('--many_objects_dataset_path', type=str, default='CoCo-FourObject-Middle-Big:4:2', help='Path:objects_size:biased_object_pos for many-objects dataset')
+parser.add_argument('--model_name', type=str, default='ViT-B-32', help='CLIP model name')
+parser.add_argument('--pretrained', type=str, default='openai', help='Pretrained model source')
+parser.add_argument('--text_batch_size', type=int, default=256, help='Batch size for text embedding')
+parser.add_argument('--image_batch_size', type=int, default=64, help='Batch size for image embedding')
+args = parser.parse_args()
 
+# Parse dataset paths
+many_objects_dataset_path = {}
+dataset_parts = args.many_objects_dataset_path.split(',')
+for part in dataset_parts:
+    path, size, pos = part.split(':')
+    many_objects_dataset_path[path] = (int(size), int(pos))
 
-# device
+# Device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# function for loading clip models
+# Function for loading clip models
 def load_model(model_name='ViT-B-32', pretrained='openai'):
     model, _, preprocess = open_clip.create_model_and_transforms(model_name, pretrained=pretrained)
     model = model.to(device)
@@ -22,7 +34,9 @@ def load_model(model_name='ViT-B-32', pretrained='openai'):
     tokenizer = open_clip.get_tokenizer(model_name)
     return model, preprocess, tokenizer
 
+
 # Extract Image Features function
+
 def extract_image_features(model, preprocess, paths):
     inputs = torch.cat([preprocess(Image.open(path).convert('RGB')).unsqueeze(0) for path in paths], dim=0).to(device)
     with torch.no_grad(), torch.cuda.amp.autocast():
@@ -30,11 +44,11 @@ def extract_image_features(model, preprocess, paths):
       features /= features.norm(dim=-1, keepdim=True)
     return features
 
-def get_dict_image_embedings(model, preprocess, dataset_path, batch_size = 64):
+def get_dict_image_embedings(model, preprocess, dataset_path, image_batch_size = 64):
     listdir = os.listdir(f'./{dataset_path}')
     image_embedings = {}
-    for i in tqdm(range(0, len(listdir), batch_size), desc="Dict Image Embedings"):
-        batch_images_name = listdir[i:i + batch_size]
+    for i in tqdm(range(0, len(listdir), image_batch_size), desc="Dict Image Embedings"):
+        batch_images_name = listdir[i:i + image_batch_size]
         image_features = extract_image_features(model, preprocess, [f'./{dataset_path}/{image_name}' for image_name in batch_images_name])
         for i, image_name in enumerate(batch_images_name):
             image_embedings[image_name] = image_features[i].unsqueeze(0)
@@ -50,17 +64,17 @@ def extract_text_features(model, tokenizer, texts):
         features /= features.norm(dim=-1, keepdim=True)
     return features
 
-def get_dict_text_embedings(model, tokenizer, texts, batch_size = 256):
+def get_dict_text_embedings(model, tokenizer, texts, text_batch_size = 256):
     text_embedings = {}
-    for i in tqdm(range(0, len(texts), batch_size), desc="Dict Text Embedings"):
-        batch_texts = texts[i:i + batch_size]
+    for i in tqdm(range(0, len(texts), text_batch_size), desc="Dict Text Embedings"):
+        batch_texts = texts[i:i + text_batch_size]
         text_features = extract_text_features(model, tokenizer, batch_texts)
         for i, text in enumerate(batch_texts):
             text_embedings[text] = text_features[i].unsqueeze(0)
     return text_embedings
 
 
-# functions to change the postions ob object in text
+# Functions to change the postions ob object in text
 
 def move_to_position(lst, current_index, target_index):
     element = lst.pop(current_index)
@@ -74,7 +88,7 @@ def swap_list(lst, idx1, idx2):
 def join_with_and(lst):
     return ' and '.join(lst[:-1]) + ' and ' + lst[-1]
 
-# prepare wrong and correct dataset
+# Prepare wrong and correct dataset
 def prepare_dataset(one_objects_dataset, biased_object_index, dataset_path, is_first_scenario):
     correct_texts = []
     wrong_texts = []
@@ -109,7 +123,7 @@ def prepare_dataset(one_objects_dataset, biased_object_index, dataset_path, is_f
 
 
 
-# calculate correct number
+# Count corrects
 
 def calculate_correct(model, tokenizer, image_embedings, correct_texts, wrong_texts_embeding):
     correct_texts_features =  extract_text_features(model, tokenizer, correct_texts)
@@ -121,7 +135,7 @@ def calculate_correct(model, tokenizer, image_embedings, correct_texts, wrong_te
 
 # Image Text Matching function
 
-def image_text_matching(model, tokenizer, model_name, dataset_path, df_dataset, image_embedings, wrong_texts_embeding, batch_size, is_first_scenario):
+def image_text_matching(model, tokenizer, model_name_full, dataset_path, df_dataset, image_embedings, wrong_texts_embeding, batch_size, is_first_scenario):
     
     
     correct = 0
@@ -133,7 +147,7 @@ def image_text_matching(model, tokenizer, model_name, dataset_path, df_dataset, 
                                         image_embedings=torch.cat([image_embedings[image_name] for image_name in images_name], dim=0).to(device), 
                                         correct_texts=correct_texts, 
                                         wrong_texts_embeding=torch.cat([wrong_texts_embeding[text] for text in wrong_texts], dim=0).to(device))
-    print(f'Model: {model_name} // Dataset: {dataset_path}')
+    print(f'Model: {model_name_full} // Dataset: {dataset_path}')
     if is_first_scenario:
         print(f'First Scenario: Acc = {correct / len(df_dataset)}') 
     else:
@@ -141,26 +155,21 @@ def image_text_matching(model, tokenizer, model_name, dataset_path, df_dataset, 
     print(50 * '-')
         
 
-# Experiments Setups
-batch_size = 512
-model_name = 'ViT-B-32'
-pretrained = 'openai'
-
 # Experiments
 one_objects_dataset = [I.replace('.png', '') for I in os.listdir(f'./{one_object_dataset_path}')]
-model, preprocess, tokenizer  = load_model(model_name=model_name, pretrained=pretrained)
-model_name = f'{model_name} - {pretrained}'
+model, preprocess, tokenizer  = load_model(model_name=args.model_name, pretrained=args.pretrained)
+model_name_full = f'{args.model_name} - {args.pretrained}'
 
 for dataset_path in many_objects_dataset_path.keys():
     n, biased_object_index = many_objects_dataset_path[dataset_path]
 
     print('Get Image Embedings:')
-    image_embedings = get_dict_image_embedings(model=model, preprocess=preprocess, dataset_path=dataset_path)
+    image_embedings = get_dict_image_embedings(model=model, preprocess=preprocess, dataset_path=dataset_path, args.image_batch_size)
 
     df_dataset = prepare_dataset(one_objects_dataset=one_objects_dataset, biased_object_index=biased_object_index - 1, dataset_path=dataset_path, is_first_scenario=True)
-    wrong_texts_embeding = get_dict_text_embedings(model=model, tokenizer=tokenizer, texts=df_dataset['wrong_text'])
-    image_text_matching(model=model, tokenizer=tokenizer, model_name=model_name, dataset_path=dataset_path, df_dataset=df_dataset, image_embedings=image_embedings, wrong_texts_embeding=wrong_texts_embeding, batch_size=batch_size, is_first_scenario=True)
+    wrong_texts_embeding = get_dict_text_embedings(model=model, tokenizer=tokenizer, texts=df_dataset['wrong_text'], args.text_batch_size)
+    image_text_matching(model=model, tokenizer=tokenizer, model_name_full=model_name_full, dataset_path=dataset_path, df_dataset=df_dataset, image_embedings=image_embedings, wrong_texts_embeding=wrong_texts_embeding, batch_size=args.text_batch_size, is_first_scenario=True)
 
     df_dataset = prepare_dataset(one_objects_dataset=one_objects_dataset, biased_object_index=biased_object_index - 1, dataset_path=dataset_path, is_first_scenario=False)
-    wrong_texts_embeding = get_dict_text_embedings(model=model, tokenizer=tokenizer, texts=df_dataset['wrong_text'])
-    image_text_matching(model=model, tokenizer=tokenizer, model_name=model_name, dataset_path=dataset_path, df_dataset=df_dataset, image_embedings=image_embedings, wrong_texts_embeding=wrong_texts_embeding, batch_size=batch_size, is_first_scenario=False)
+    wrong_texts_embeding = get_dict_text_embedings(model=model, tokenizer=tokenizer, texts=df_dataset['wrong_text'], args.text_batch_size)
+    image_text_matching(model=model, tokenizer=tokenizer, model_name_full=model_name_full, dataset_path=dataset_path, df_dataset=df_dataset, image_embedings=image_embedings, wrong_texts_embeding=wrong_texts_embeding, batch_size=args.text_batch_size, is_first_scenario=False)

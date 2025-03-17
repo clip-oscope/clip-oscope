@@ -1,5 +1,5 @@
 # import libraries
-
+import argparse
 import torch
 from torch import nn
 from PIL import Image
@@ -11,16 +11,27 @@ import open_clip
 from torchvision import transforms
 import matplotlib.pyplot as plt
 
+# Argument Parser
+parser = argparse.ArgumentParser(description="IOC Experiments Setups")
+parser.add_argument("--one_object_dataset_path", type=str, default="CoCo-OneObject", help="Path to one object dataset")
+parser.add_argument("--many_objects_dataset_path", type=str, default="CoCo-FourObject-Middle-Big:4", help="Path and object count in format 'path:number'")
+parser.add_argument("--model_name", type=str, default="ViT-B-32", help="Model name")
+parser.add_argument("--pretrained", type=str, default="openai", help="Pretrained model source")
+parser.add_argument("--epochs", type=int, default=25, help="Number of training epochs")
+parser.add_argument("--batch_size", type=int, default=8, help="Batch size for processing images")
+args = parser.parse_args()
 
-# dataset paths for one_object and custom dataset. 
-one_object_dataset_path = 'CoCo-OneObject'
-many_objects_dataset_path = {'CoCo-FourObject-Middle-Big': 4} # path: number of objects
 
+# Dataset paths for one_object and custom dataset. 
+one_object_dataset_path = args.one_object_dataset_path
+many_objects_dataset_path = {}
+path, num_objects = args.many_objects_dataset_path.split(":")
+many_objects_dataset_path[path] = int(num_objects)
 
-# device
+# Device setup
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# function for loading clip models
+# Function for loading clip models
 def load_model(model_name='ViT-B-32', pretrained='openai'):
     model, _, preprocess = open_clip.create_model_and_transforms(model_name, pretrained=pretrained)
     model = model.to(device)
@@ -39,7 +50,6 @@ def extract_image_features(paths, model, preprocess):
 
 
 # Define Custom Dataset Class
-
 class HeadDataset(Dataset):
     def __init__(self, model, preprocess, dataset_path, one_objects_classes, batch_size=128, device='cuda:0'):
         self.image_encoders_output = []
@@ -83,7 +93,6 @@ class Head(nn.Module):
 
 
 # Train Functions
-
 def report_results(epoch, total_losses, corrects, size):
   print(f"Epoch {epoch + 1}")
   for i, (total_loss, correct) in enumerate(zip(total_losses, corrects)):
@@ -144,7 +153,7 @@ def test_one_epoch(epoch, k, dataloader, heads, criterion, show_logs=False):
 
 
 
-def test_and_train(n, model_name, dataset_path, epochs, train_dataloader, test_dataloader, heads, optimizers, criterion):
+def test_and_train(n, model_name_full, dataset_path, epochs, train_dataloader, test_dataloader, heads, optimizers, criterion):
 
     train_losses = []
     train_accuracies = []
@@ -164,38 +173,33 @@ def test_and_train(n, model_name, dataset_path, epochs, train_dataloader, test_d
     test_accuracies = 100 * np.array(test_accuracies)
 
     print("IOC Results: \n")
-    print(f'{model_name}: {dataset_path}')
+    print(f'{model_name_full}: {dataset_path}')
     for i in range(n):
         print(f'Object {i + 1}: train:{round(train_accuracies[-1, i], 2)} test:{round(test_accuracies[-1, i], 2)}')
 
 
-# one object names
+# One object names
 one_objects_classes = [image_name.replace('.png', '') for image_name in os.listdir(f'./{one_object_dataset_path}')]
 
-# Experiments Setups
-epochs = 25
-model_name = 'ViT-B-32'
-pretrained = 'openai'
 
 # Experiments
-model, preprocess,  = load_model(model_name=model_name, pretrained=pretrained)
+model, preprocess,  = load_model(model_name=args.model_name, pretrained=args.pretrained)
 
-model_name = f'{model_name} - {pretrained}'
+model_name_full = f'{args.model_name} - {args.pretrained}'
     
 for dataset_path in many_objects_dataset_path.keys():
 
     n = many_objects_dataset_path[dataset_path]
 
-    batch_size = 128
     print("Preparing Dataset:")
     total_set = HeadDataset(model, preprocess, dataset_path, one_objects_classes)
     train_set, test_set = random_split(total_set, [0.8, 0.2])
-    train_dataloader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
-    test_dataloader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
+    train_dataloader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True)
+    test_dataloader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False)
     print("Datasets Created Successfully")
     
     heads = [Head(len(one_objects_classes)).to(device) for i in range(n)]
     criterion = torch.nn.CrossEntropyLoss()
     optimizers = [torch.optim.Adam(head.parameters(), lr=1e-3) for head in heads]
 
-    test_and_train(n, model_name, dataset_path, epochs, train_dataloader, test_dataloader, heads, optimizers, criterion)
+    test_and_train(n, model_name_full, dataset_path, args.epochs, train_dataloader, test_dataloader, heads, optimizers, criterion)

@@ -7,18 +7,28 @@ import numpy as np
 import os
 from tqdm.auto import tqdm
 import os
+import argparse
 
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="IOR Experiments Setups")
+parser.add_argument("--one_object_dataset_path", type=str, default="CoCo-OneObject", help="Path to one object dataset")
+parser.add_argument("--many_objects_dataset_path", type=str, default="CoCo-FourObject-Middle-Big:4", help="Path and object count in format 'path:number'")
+parser.add_argument("--model_name", type=str, default="ViT-B-32", help="Model name")
+parser.add_argument("--pretrained", type=str, default="openai", help="Pretrained model source")
+parser.add_argument("--batch_size", type=int, default=8, help="Batch size for processing images")
+args = parser.parse_args()
 
-# dataset paths for one_object and custom dataset. 
-one_object_dataset_path = 'CoCo-OneObject'
-many_objects_dataset_path = {'CoCo-FourObject-Middle-Big': 4} # path: number of objects
+# Dataset paths for one_object and custom dataset. 
+one_object_dataset_path = args.one_object_dataset_path
+many_objects_dataset_path = {}
+path, num_objects = args.many_objects_dataset_path.split(":")
+many_objects_dataset_path[path] = int(num_objects)
 
-
-# device
+# Device setup
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-# function for loading clip models
+# Function for loading clip models
 def load_model(model_name='ViT-B-32', pretrained='openai'):
     model, _, preprocess = open_clip.create_model_and_transforms(model_name, pretrained=pretrained)
     model = model.to(device)
@@ -35,8 +45,7 @@ def extract_image_features(paths, model, preprocess):
     return features
 
 
-# different metrics to report
-
+# Different metrics to report
 def calculate_metrics(actual, predicted):
     relevant_set = set(actual)
     retrieved_set = set(predicted)
@@ -94,11 +103,9 @@ def precision_recall_at_n(actual, predicted, n):
 
 
 # Find Top K
-
-def top_k(dataset_path, n, model, preprocess, one_objects_features):
+def top_k(dataset_path, n, model, preprocess, one_objects_features, batch_size=8):
     topn_correct = 0
     object_correct_in_topn = [0] * n
-    batch_size = 8
 
     actual = list()
     predicted = list()
@@ -136,16 +143,16 @@ def top_k(dataset_path, n, model, preprocess, one_objects_features):
 
 
 # IOR function to report IOR results
-def report_ior(dataset_path, n, model_name, model, preprocess, one_objects_features):
+def report_ior(dataset_path, n, model_name_full, model, preprocess, one_objects_features, batch_size):
     
-    base_images_addresses, topn_correct, object_correct_in_topn, actual, predicted, n_objects_most_similarity = top_k(dataset_path, n, model, preprocess, one_objects_features)
+    base_images_addresses, topn_correct, object_correct_in_topn, actual, predicted, n_objects_most_similarity = top_k(dataset_path, n, model, preprocess, one_objects_features, batch_size)
 
     topn_accuracy = topn_correct / len(base_images_addresses)
     object_accuracies_in_topn = [correct / topn_correct if topn_correct else 0 for correct in object_correct_in_topn]
 
     print("IOR Results:")
 
-    print(f'{dataset_path}, {model_name}')
+    print(f'{dataset_path}, {model_name_full}')
     print(f'Top-{n} Accuracy: {topn_accuracy:.4f}')
     for i, accuracy in enumerate(object_accuracies_in_topn):
         print(f'Object {i+1} Accuracy in Correct Top-{n}: {accuracy:.4f}')
@@ -201,20 +208,14 @@ def report_ior(dataset_path, n, model_name, model, preprocess, one_objects_featu
 
 
 
-# one object names
+# One object names
 one_objects_classes = [image_name.replace('.png', '') for image_name in os.listdir(f'./{one_object_dataset_path}')]
 
-
-# Experiments Setups
-model_name = 'ViT-B-32'
-pretrained = 'openai'
-
 # Experiments
-model, preprocess,  = load_model(model_name=model_name, pretrained=pretrained)
+model, preprocess,  = load_model(model_name=args.model_name, pretrained=args.pretrained)
 one_objects_features = extract_image_features([f'./{one_object_dataset_path}/{one_objects_class}.png' for one_objects_class in one_objects_classes], model, preprocess)
-model_name = f'{model_name} - {pretrained}'
-
+model_name_full = f'{args.model_name} - {args.pretrained}'
 
 for dataset_path in many_objects_dataset_path.keys():
     n = many_objects_dataset_path[dataset_path]
-    report_ior(dataset_path, n, model_name, model, preprocess, one_objects_features)
+    report_ior(dataset_path, n, model_name_full, model, preprocess, one_objects_features, args.batch_size)
