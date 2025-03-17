@@ -2,8 +2,8 @@
 
 This folder contains three Python scripts for analyzing different aspects of image encoding and object understanding:
 
-- `ior.py` (Image-based Object Retrieval): Analyzes how well the model can retrieve specific objects from images
-- `ioc.py` (Image-based Object Classification): Evaluates the model's ability to classify objects in images
+- `IOR.py` (Image-based Object Retrieval): Analyzes how well the model can retrieve specific objects from images
+- `IOC.py` (Image-based Object Classification): Evaluates the model's ability to classify objects in images
 - `Image_Text_Matching.py`: Implements two different scenarios of image-text matching analysis
 
 ## Installation
