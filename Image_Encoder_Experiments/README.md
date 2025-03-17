@@ -87,6 +87,6 @@ python Image_Text_Matching.py
 --many_objects_dataset_path=/path/to/multiple_objects_dataset:4:2
 --model_name=ViT-B/32
 --pretrained=openai
---text_batch_size=32
---image_batch_size=128
+--text_batch_size=128
+--image_batch_size=32
 ```
