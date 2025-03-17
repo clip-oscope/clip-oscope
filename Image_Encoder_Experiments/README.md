@@ -8,33 +8,19 @@ This folder contains three Python scripts for analyzing different aspects of ima
 
 ## Installation
 
-1. First, ensure you have Python installed on your system and CUDA if you plan to use GPU acceleration.
-
-2. Create a virtual environment (recommended):
-```bash
-python -m venv venv
-
-# On Windows
-.\venv\Scripts\activate
-
-# On Unix or MacOS
-source venv/bin/activate
-```
-
-3. Install the required packages:
+Install the required packages:
 ```bash
 pip install -r requirements.txt
 ```
 
 Required packages include:
-- pandas==2.2.3
-- torch==2.5.1+cu121
-- torchaudio==2.5.1+cu121
+- pandas
+- torch
 - torchvision==0.20.1+cu121
-- tqdm==4.67.1
-- pillow==10.2.0
+- tqdm
+- pillow
 - open_clip_torch==2.30.0
-- matplotlib==3.10.0
+- matplotlib
 
 ## Dataset Input Format
 
