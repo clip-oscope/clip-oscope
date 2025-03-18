@@ -156,7 +156,7 @@ def image_text_matching(model, tokenizer, model_name_full, dataset_path, df_data
         
 
 # Experiments
-one_objects_dataset = [I.replace('.png', '') for I in os.listdir(f'./{one_object_dataset_path}')]
+one_objects_dataset = [I.replace('.png', '') for I in os.listdir(f'./{args.one_object_dataset_path}')]
 model, preprocess, tokenizer  = load_model(model_name=args.model_name, pretrained=args.pretrained)
 model_name_full = f'{args.model_name} - {args.pretrained}'
 
@@ -164,12 +164,12 @@ for dataset_path in many_objects_dataset_path.keys():
     n, biased_object_index = many_objects_dataset_path[dataset_path]
 
     print('Get Image Embedings:')
-    image_embedings = get_dict_image_embedings(model=model, preprocess=preprocess, dataset_path=dataset_path, args.image_batch_size)
+    image_embedings = get_dict_image_embedings(model=model, preprocess=preprocess, dataset_path=dataset_path, image_batch_size=args.image_batch_size)
 
     df_dataset = prepare_dataset(one_objects_dataset=one_objects_dataset, biased_object_index=biased_object_index - 1, dataset_path=dataset_path, is_first_scenario=True)
-    wrong_texts_embeding = get_dict_text_embedings(model=model, tokenizer=tokenizer, texts=df_dataset['wrong_text'], args.text_batch_size)
+    wrong_texts_embeding = get_dict_text_embedings(model=model, tokenizer=tokenizer, texts=df_dataset['wrong_text'], text_batch_size=args.text_batch_size)
     image_text_matching(model=model, tokenizer=tokenizer, model_name_full=model_name_full, dataset_path=dataset_path, df_dataset=df_dataset, image_embedings=image_embedings, wrong_texts_embeding=wrong_texts_embeding, batch_size=args.text_batch_size, is_first_scenario=True)
 
     df_dataset = prepare_dataset(one_objects_dataset=one_objects_dataset, biased_object_index=biased_object_index - 1, dataset_path=dataset_path, is_first_scenario=False)
-    wrong_texts_embeding = get_dict_text_embedings(model=model, tokenizer=tokenizer, texts=df_dataset['wrong_text'], args.text_batch_size)
+    wrong_texts_embeding = get_dict_text_embedings(model=model, tokenizer=tokenizer, texts=df_dataset['wrong_text'], text_batch_size=args.text_batch_size)
     image_text_matching(model=model, tokenizer=tokenizer, model_name_full=model_name_full, dataset_path=dataset_path, df_dataset=df_dataset, image_embedings=image_embedings, wrong_texts_embeding=wrong_texts_embeding, batch_size=args.text_batch_size, is_first_scenario=False)
