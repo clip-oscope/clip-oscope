@@ -1,6 +1,6 @@
 pandas
 torch
-torchvision==0.20.1+cu121
+torchvision
 tqdm
 pillow
 open_clip_torch==2.30.0
