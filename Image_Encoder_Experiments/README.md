@@ -64,7 +64,7 @@ All scripts support the following arguments:
 python IOR.py 
 --one_object_dataset_path=/path/to/single_object_dataset 
 --many_objects_dataset_path=/path/to/multiple_objects_dataset:4
---model_name=ViT-B/32
+--model_name=ViT-B-32
 --pretrained=openai
 --batch_size=32
 ```
@@ -74,7 +74,7 @@ python IOR.py
 python IOC.py 
 --one_object_dataset_path=/path/to/single_object_dataset 
 --many_objects_dataset_path=/path/to/multiple_objects_dataset:4
---model_name=ViT-B/32
+--model_name=ViT-B-32
 --pretrained=openai
 --batch_size=32
 --epochs=25        # Additional parameter specific to IOC
@@ -85,7 +85,7 @@ python IOC.py
 python Image_Text_Matching.py 
 --one_object_dataset_path=/path/to/single_object_dataset 
 --many_objects_dataset_path=/path/to/multiple_objects_dataset:4:2
---model_name=ViT-B/32
+--model_name=ViT-B-32
 --pretrained=openai
 --text_batch_size=128
 --image_batch_size=32
